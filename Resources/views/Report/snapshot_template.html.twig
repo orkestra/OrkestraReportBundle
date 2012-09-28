@@ -1,0 +1,45 @@
+{% if presentation.snapshots|length > 0 %}
+{% set snapshot = presentation.snapshots[0] %}
+{% set options = presentation.report.snapshotOptions %}
+<div class="snapshot-report">
+  <table>
+    {% if options.series|length > 0 and options.categories|length > 0 %}
+    {# 
+        Presentation logic for reports with categories & series 
+    #}
+    <tr>
+        <th></th>
+    {% for category in options.categories %}
+        <th>{{ category }}</th>
+    {% endfor %}
+    </tr>
+    {% for series in options.series %}
+    <tr>
+        <th>{{ series.title }}</th>
+        {% for fact in series.facts %}
+        <td>{{ options.formatValue(fact, snapshot.fact(fact)) }}</td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    {% else %}
+    {# 
+        Presentation logic for reports without categories or series
+    #}
+    <tr>
+    {% for fact in presentation.facts %}
+        <th>{{ presentation.label(fact) }}</th>
+    {% endfor %}
+    </tr>
+    <tr>
+        {% for fact in presentation.facts %}
+        <td>{{ options.formatValue(fact, snapshot.fact(fact)) }}</td>
+        {% endfor %}
+    </tr>
+    {% endif %}
+  </table>
+  <p class="break"></p>
+  <p>Data last updated at: {{ snapshot.dateCreated }}</p>
+</div>
+{% else %}
+<p style="padding: 10px">No results.</p>
+{% endif %}

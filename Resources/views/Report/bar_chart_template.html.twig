@@ -1,0 +1,60 @@
+{% if presentation.snapshots|length > 0 %}
+{% set snapshot = presentation.snapshots[0] %}
+{% set options = presentation.report.barChartOptions %}
+<script type="text/javascript">
+var chart, options;
+$(function () {
+    options = {
+        chart: {
+            renderTo: 'inner-body',
+            type: '{{ options.chartType }}',
+            marginRight: 130,
+            marginBottom: 25,
+            backgroundColor: 'transparent'
+        },
+        title: {
+            text: ''
+        },
+        xAxis: {
+            categories: ['{{ options.categories|join('\', \'')|raw }}']
+        },
+        yAxis: {
+            title: {
+                text: 'Dollars ($)'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            formatter: function() {
+                    return '<b>' + this.series.name + '</b><br/>' +
+                    this.x + ': $' + this.y;
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'top',
+            x: -10,
+            y: 100,
+            borderWidth: 0
+        },
+        series: [{% for name, set in options.series %}
+            {
+        	    name: '{{ name }}',
+        	    data: [{% for fact in set %}{{ snapshot.fact(fact)|default(0) }},{% endfor %}]
+        },{% endfor %}]
+    };
+
+    $.extend(true, options, {{ options.overrideOptions|raw }});
+
+    chart = new Highcharts.Chart(options);
+    
+});
+</script>
+{% else %}
+<p style="padding: 10px">No results.</p>
+{% endif %}

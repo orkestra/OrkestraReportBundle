@@ -1,0 +1,26 @@
+parameters:
+  orkestra.report_factory.class: Orkestra\Bundle\ReportBundle\ReportFactory
+
+services:
+  # Twig extensions
+  orkestra.twig_extension.report:
+    class: Orkestra\Bundle\ReportBundle\Twig\ReportExtension
+    tags:
+      - { name: twig.extension }
+
+  # Report component
+  orkestra.report_factory:
+    class: %orkestra.report_factory.class%
+    arguments: [ @templating, @doctrine.orm.default_entity_manager, @form.factory ]
+  orkestra.report_presenter.snapshot:
+    class: Orkestra\Bundle\ReportBundle\Presenter\SnapshotPresenter
+    tags:
+      - { name: orkestra.report_presenter }
+  orkestra.report_presenter.bar_chart:
+    class: Orkestra\Bundle\ReportBundle\Presenter\BarChartPresenter
+    tags:
+      - { name: orkestra.report_presenter }
+  orkestra.report_presenter.line_chart:
+    class: Orkestra\Bundle\ReportBundle\Presenter\LineChartPresenter
+    tags:
+      - { name: orkestra.report_presenter }

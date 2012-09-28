@@ -1,0 +1,47 @@
+{% if presentation.snapshots|length > 0 %}
+{% set options = presentation.report.linechartoptions %}
+<script type="text/javascript">
+var chart, options;
+$(function () {
+    options = {
+        chart: {
+            renderTo: 'inner-body',
+            type: '{{ options.chartType }}',
+            marginBottom: 70,
+            backgroundColor: 'transparent'
+        },
+        title: {
+            text: ''
+        },
+        xAxis: {
+            type: 'datetime',
+        },
+        yAxis: [{% for axis in options.yaxes %}{
+            title: {
+                text: '{{ axis.title }}'
+            },
+            labels: {
+                formatter: {{ axis.formatter|default('function() { return this.value; }')|raw }}
+            },
+            opposite: {{ axis.opposite|default(false) ? 'true' : 'false' }}
+        },{% endfor %}],
+        series: [{% for index,axis in options.yaxes %}
+            {% for fact in axis.facts %}
+               {
+            yAxis: {{ index }},
+            type: '{{ axis.type|default(options.chartType) }}',
+            pointStart: (new Date('{{ presentation.snapshots|slice(0,1)[0].dateCreated.format('F j, Y H:i:s') }}')).getTime(),
+        	name: '{{ presentation.getLabel(fact) }}',
+        	data: [{% for snapshot in presentation.snapshots %}[(new Date('{{ snapshot.dateCreated.format('F j, Y H:i:s') }}')).getTime(), {{ snapshot.fact(fact)|default(0) }}],{% endfor %}]
+        },{% endfor %}
+        {% endfor %}]
+    };
+
+    $.extend(true, options, {{ options.overrideOptions|raw }});
+
+    chart = new Highcharts.Chart(options);
+});
+</script>
+{% else %}
+<p style="padding: 10px">No results.</p>
+{% endif %}
