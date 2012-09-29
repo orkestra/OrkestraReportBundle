@@ -24,3 +24,7 @@ services:
     class: Orkestra\Bundle\ReportBundle\Presenter\LineChartPresenter
     tags:
       - { name: orkestra.report_presenter }
+  orkestra.report_presenter.pie_chart:
+    class: Orkestra\Bundle\ReportBundle\Presenter\PieChartPresenter
+    tags:
+      - { name: orkestra.report_presenter }

@@ -1,0 +1,51 @@
+{% if presentation.snapshots|length > 0 %}
+{% set snapshot = presentation.snapshots[0] %}
+{% set options = presentation.report.pieChartOptions %}
+<script type="text/javascript">
+var chart, options;
+$(function () {
+
+    options = {
+        chart: {
+            renderTo: '{{ options.renderId }}',
+            backgroundColor: 'transparent',
+            spacingLeft: 30,
+            spacingRight: 30
+        },
+        title: {
+            text: '{{ options.title }}'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    distance: 0,
+                    enabled: true,
+                    color: '#000000',
+                    connectorColor: '#000000',
+                    formatter: function() {
+                        return '<b>'+ this.point.name +'</b>: '+ Math.round(this.percentage) +' %';
+
+                    }
+                }
+            }
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.y}</b>',
+            percentageDecimals: 1
+        },
+        series: [{
+            type: 'pie',
+            name: '{{ options.seriesName }}',
+            data: [{% for fact in options.facts %} ['{{ presentation.label(fact) }}', {{ snapshot.fact(fact) }} ], {% endfor %}]
+        }]
+    };
+
+    chart = new Highcharts.Chart(options);
+
+});
+</script>
+{% else %}
+<p style="padding: 10px">No results.</p>
+{% endif %}

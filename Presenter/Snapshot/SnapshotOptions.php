@@ -69,7 +69,7 @@ class SnapshotOptions
 	 *
 	 * @param callable $formatter
 	 *
-	 * @return Orkestra\Bundle\ReportBundle\Presenter\Snapshot\SnapshotOptions The current SnapshotOptions
+	 * @return \Orkestra\Bundle\ReportBundle\Presenter\Snapshot\SnapshotOptions The current SnapshotOptions
 	 */
 	public function setValueFormatter($formatter)
 	{
