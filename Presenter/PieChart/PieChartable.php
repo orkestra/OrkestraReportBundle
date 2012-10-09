@@ -2,6 +2,8 @@
 
 namespace Orkestra\Bundle\ReportBundle\Presenter\PieChart;
 
+use Orkestra\Bundle\ReportBundle\Entity\Snapshot;
+
 /**
  * Defines the contract that a report must follow to support the PieChartPresenter
  */
@@ -12,5 +14,5 @@ interface PieChartable
 	 *
 	 * @return \Orkestra\Bundle\ReportBundle\Presenter\PieChart\PieChartOptions
 	 */
-	function getPieChartOptions();
+	function getPieChartOptions(Snapshot $snapshot);
 }

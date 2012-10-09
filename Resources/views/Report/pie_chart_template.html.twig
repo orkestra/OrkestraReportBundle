@@ -1,6 +1,6 @@
 {% if presentation.snapshots|length > 0 %}
 {% set snapshot = presentation.snapshots[0] %}
-{% set options = presentation.report.pieChartOptions %}
+{% set options = presentation.report.pieChartOptions(snapshot) %}
 <script type="text/javascript">
 var chart, options;
 $(function () {
@@ -38,7 +38,7 @@ $(function () {
         series: [{
             type: 'pie',
             name: '{{ options.seriesName }}',
-            data: [{% for fact in options.facts %} ['{{ presentation.label(fact) }}', {{ snapshot.fact(fact) }} ], {% endfor %}]
+            data: [{% for label,value in options.facts %} ['{{ label }}', {{ value }} ], {% endfor %}]
         }]
     };
 
