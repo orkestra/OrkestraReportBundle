@@ -15,7 +15,7 @@ interface FilterInterface
     /**
      * Apply the current state of the filter to the given QueryBuilder instance
      *
-     * @param Doctrine\ORM\QueryBuilder $qb
+     * @param \Doctrine\ORM\QueryBuilder $qb
      *
      * @return void
      */
@@ -24,7 +24,7 @@ interface FilterInterface
     /**
      * Binds the given request to the filter
      *
-     * @param Symfony\Component\HttpFoundation\Request $request
+     * @param \Symfony\Component\HttpFoundation\Request $request
      *
      * @return void
      */
@@ -33,7 +33,7 @@ interface FilterInterface
     /**
      * Allows the filter to add form elements to the report's filter form
      *
-     * @param Symfony\Component\Form\FormBuilder $builder
+     * @param \Symfony\Component\Form\FormBuilder $builder
      *
      * @return void
      */

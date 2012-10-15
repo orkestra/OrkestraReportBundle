@@ -16,73 +16,88 @@ use Orkestra\Bundle\ReportBundle\Form\FilterFormType;
 class Presentation
 {
     /**
-     * @var Symfony\Bundle\FrameworkBundle\Templating\EngineInterface
+     * @var \Symfony\Bundle\FrameworkBundle\Templating\EngineInterface
      */
-    protected $_engine;
+    protected $engine;
 
     /**
-     * @var Doctrine\ORM\QueryBuilder
+     * @var \Doctrine\ORM\QueryBuilder
      */
-    protected $_queryBuilder;
+    protected $queryBuilder;
 
     /**
-     * @var Symfony\Component\Form\FormFactory
+     * @var \Symfony\Component\Form\FormFactory
      */
-    protected $_formFactory;
+    protected $formFactory;
 
     /**
-     * @var Orkestra\Bundle\ReportBundle\ReportFactory
+     * @var \Orkestra\Bundle\ReportBundle\ReportFactory
      */
-    protected $_reportFactory;
+    protected $reportFactory;
 
     /**
-     * @var Orkestra\Bundle\ReportBundle\IPresenter
+     * @var \Orkestra\Bundle\ReportBundle\PresenterInterface
      */
-    protected $_presenter;
+    protected $presenter;
 
     /**
-     * @var Orkestra\Bundle\ReportBundle\IReport
+     * @var \Orkestra\Bundle\ReportBundle\ReportInterface
      */
-    protected $_report;
+    protected $report;
 
     /**
-     * @var Symfony\Component\HttpFoundation\Request
+     * @var \Symfony\Component\HttpFoundation\Request
      */
-    protected $_request;
+    protected $request;
 
     /**
-     * @var Doctrine\Common\Collections\ArrayCollection
+     * @var \Doctrine\Common\Collections\ArrayCollection
      */
-    protected $_snapshots;
+    protected $snapshots;
 
     /**
-     * @var Symfony\Component\Form\Form
+     * @var \Symfony\Component\Form\Form
      */
-    protected $_form;
+    protected $form;
+
+    /**
+     * @var array
+     */
+    protected $filters;
 
     /**
      * Constructor
      *
-     * @param Symfony\Bundle\FrameworkBundle\Templating\EngineInterface $engine
-     * @param Doctrine\ORM\QueryBuilder $queryBuilder
-     * @param Symfony\Component\Form\FormFactory $formFactory
-     * @param Orkestra\Bundle\ReportBundle\ReportFactory $reportFactory
-     * @param Orkestra\Bundle\ReportBundle\IPresenter $presenter
-     * @param Orkestra\Bundle\ReportBundle\IReport $report
-     * @param Symfony\Component\HttpFoundation\Request $request Optional Request to bind the Presentation to
+     * @param \Symfony\Bundle\FrameworkBundle\Templating\EngineInterface $engine
+     * @param \Doctrine\ORM\QueryBuilder $queryBuilder
+     * @param \Symfony\Component\Form\FormFactory $formFactory
+     * @param \Orkestra\Bundle\ReportBundle\ReportFactory $reportFactory
+     * @param \Orkestra\Bundle\ReportBundle\PresenterInterface $presenter
+     * @param \Orkestra\Bundle\ReportBundle\ReportInterface $report
+     * @param \Symfony\Component\HttpFoundation\Request $request Optional Request to bind the Presentation to
+     *
+     * @throws \RuntimeException
      */
-    public function __construct(EngineInterface $engine, QueryBuilder $queryBuilder, FormFactory $formFactory, ReportFactory $reportFactory, PresenterInterface $presenter, ReportInterface $report, Request $request = null)
-    {
+    public function __construct(
+        EngineInterface $engine,
+        QueryBuilder $queryBuilder,
+        FormFactory $formFactory,
+        ReportFactory $reportFactory,
+        PresenterInterface $presenter,
+        ReportInterface $report,
+        Request $request = null
+    ) {
     	if (!$presenter->supports($report)) {
     		throw new \RuntimeException(sprintf('The report "%s" does not support the functionality required by the presenter "%s"', $report->getName(), $presenter->getName()));
     	}
 
-        $this->_engine = $engine;
-        $this->_queryBuilder = $queryBuilder;
-        $this->_formFactory = $formFactory;
-        $this->_reportFactory = $reportFactory;
-        $this->_presenter = $presenter;
-        $this->_report = $report;
+        $this->engine = $engine;
+        $this->queryBuilder = $queryBuilder;
+        $this->formFactory = $formFactory;
+        $this->reportFactory = $reportFactory;
+        $this->presenter = $presenter;
+        $this->report = $report;
+        $this->filters = $presenter->getFilters();
 
         if ($request) {
             $this->bindRequest($request);
@@ -92,21 +107,21 @@ class Presentation
     /**
      * Gets the associated presenter
      *
-     * @return Orkestra\Bundle\ReportBundle\IPresenter
+     * @return \Orkestra\Bundle\ReportBundle\PresenterInterface
      */
     public function getPresenter()
     {
-    	return $this->_presenter;
+    	return $this->presenter;
     }
 
     /**
      * Gets the associated report
      *
-     * @return Orkestra\Bundle\ReportBundle\IReport
+     * @return \Orkestra\Bundle\ReportBundle\ReportInterface
      */
     public function getReport()
     {
-    	return $this->_report;
+    	return $this->report;
     }
 
     /**
@@ -116,22 +131,51 @@ class Presentation
      */
     public function isBound()
     {
-        return empty($this->_request) ? false : true;
+        return empty($this->request) ? false : true;
     }
 
     /**
      * Binds the Presentation to a Request
      *
-     * @param Symfony\Component\HttpFoundation\Request $request
+     * @param \Symfony\Component\HttpFoundation\Request $request
      */
     public function bindRequest(Request $request)
     {
-        $this->_request = $request;
+        $this->request = $request;
 
-        $this->getForm()->bindRequest($request);
+        $this->getForm()->bind($request);
 
-        foreach ($this->_presenter->getFilters() as $filter) {
-            $filter->bindRequest($this->_request);
+        foreach ($this->filters as $filter) {
+            /** @var \Orkestra\Bundle\ReportBundle\FilterInterface $filter */
+            $filter->bindRequest($this->request);
+        }
+    }
+
+    /**
+     * Appends a filter to this Presentation
+     *
+     * TODO: Should this fail silently?
+     *
+     * @param \Orkestra\Bundle\ReportBundle\FilterInterface $filter
+     */
+    public function appendFilter(FilterInterface $filter)
+    {
+        if (!$this->isBound()) {
+            array_push($this->filters, $filter);
+        }
+    }
+
+    /**
+     * Prepends a filter to this Presentation
+     *
+     * TODO: Should this fail silently?
+     *
+     * @param \Orkestra\Bundle\ReportBundle\FilterInterface $filter
+     */
+    public function prependFilter(FilterInterface $filter)
+    {
+        if (!$this->isBound()) {
+            array_unshift($this->filters, $filter);
         }
     }
 
@@ -142,7 +186,7 @@ class Presentation
      */
     public function render()
     {
-        return $this->_engine->render($this->_presenter->getTemplate(), array('presentation' => $this));
+        return $this->engine->render($this->presenter->getTemplate(), array('presentation' => $this));
     }
 
     /**
@@ -150,15 +194,15 @@ class Presentation
      *
      * If the Form does not yet exist, it will be created at the time of this method call
      *
-     * @return Symfony\Component\Form\Form
+     * @return \Symfony\Component\Form\Form
      */
     public function getForm()
     {
-        if (!$this->_form) {
-            $this->_form = $this->_formFactory->create(new FilterFormType($this->_presenter->getFilters()));
+        if (!$this->form) {
+            $this->form = $this->formFactory->create(new FilterFormType($this->presenter->getFilters()));
         }
 
-        return $this->_form;
+        return $this->form;
     }
 
     /**
@@ -166,27 +210,28 @@ class Presentation
      *
      * If the Snapshots have not yet been fetched, they will be at the time of this method call
      *
-     * @return Doctrine\Common\Collections\ArrayCollection
+     * @return \Doctrine\Common\Collections\ArrayCollection
      */
     public function getSnapshots()
     {
-        if (!$this->_snapshots) {
-            $qb = $this->_queryBuilder;
+        if (!$this->snapshots) {
+            $qb = $this->queryBuilder;
             $qb->select('s')
                ->from('Orkestra\Bundle\ReportBundle\Entity\Snapshot', 's')
                ->where('s.report = :report');
-            $qb->setParameter('report', $this->_report->getName());
+            $qb->setParameter('report', $this->report->getName());
 
-            foreach ($this->_presenter->getFilters() as $filter) {
+            foreach ($this->filters as $filter) {
+                /** @var \Orkestra\Bundle\ReportBundle\FilterInterface $filter */
                 $filter->apply($qb);
             }
 
             $query = $qb->getQuery();
 
-            $this->_snapshots = $query->getResult();
+            $this->snapshots = $query->getResult();
         }
 
-        return $this->_snapshots;
+        return $this->snapshots;
     }
 
     /**
@@ -196,7 +241,7 @@ class Presentation
      */
     public function getName()
     {
-        return $this->_report->getName();
+        return $this->report->getName();
     }
 
     /**
@@ -206,7 +251,7 @@ class Presentation
      */
     public function getTemplate()
     {
-        return $this->_presenter->getTemplate();
+        return $this->presenter->getTemplate();
     }
 
     /**
@@ -216,16 +261,18 @@ class Presentation
      */
     public function getFacts()
     {
-        return $this->_report->getFacts();
+        return $this->report->getFacts();
     }
 
     /**
      * Gets a pretty label for a fact from the associated report
      *
+     * @param string $fact
+     *
      * @return string
      */
     public function getLabel($fact)
     {
-    	return $this->_report->getLabel($fact);
+    	return $this->report->getLabel($fact);
     }
 }

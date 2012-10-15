@@ -3,9 +3,8 @@
 namespace Orkestra\Bundle\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-
+use Orkestra\Bundle\ReportBundle\Model\SnapshotInterface;
 use Orkestra\Common\Entity\EntityBase;
-
 use Orkestra\Bundle\ReportBundle\ReportInterface;
 
 /**
@@ -14,7 +13,7 @@ use Orkestra\Bundle\ReportBundle\ReportInterface;
  * @ORM\Table(name="orkestra_snapshots")
  * @ORM\Entity
  */
-class Snapshot extends EntityBase
+class Snapshot extends EntityBase implements SnapshotInterface
 {
     /**
      * @var string
@@ -33,7 +32,7 @@ class Snapshot extends EntityBase
     /**
      * Constructor
      *
-     * @param Orkestra\Bundle\ReportBundle\IReport $report
+     * @param \Orkestra\Bundle\ReportBundle\ReportInterface $report
      * @param array $facts An associative array of facts
      */
     public function __construct(ReportInterface $report, array $facts = array())
@@ -65,7 +64,7 @@ class Snapshot extends EntityBase
     /**
      * Gets a single fact by its key
      *
-     * @param string $key
+     * @param string $name
      *
      * @return mixed
      */

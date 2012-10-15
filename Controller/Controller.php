@@ -14,7 +14,7 @@ class Controller extends BaseController
      *
      * @return \Orkestra\Bundle\ReportBundle\Presentation
      */
-    public function createPresentation($presenter, $report)
+    protected function createPresentation($presenter, $report)
     {
         $factory = $this->get('orkestra.report_factory');
 
