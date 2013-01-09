@@ -4,7 +4,7 @@ namespace Orkestra\Bundle\ReportBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Orkestra\Bundle\ReportBundle\Model\SnapshotInterface;
-use Orkestra\Common\Entity\EntityBase;
+use Orkestra\Common\Entity\AbstractEntity;
 use Orkestra\Bundle\ReportBundle\ReportInterface;
 
 /**
@@ -13,7 +13,7 @@ use Orkestra\Bundle\ReportBundle\ReportInterface;
  * @ORM\Table(name="orkestra_snapshots")
  * @ORM\Entity
  */
-class Snapshot extends EntityBase implements SnapshotInterface
+class Snapshot extends AbstractEntity implements SnapshotInterface
 {
     /**
      * @var string
