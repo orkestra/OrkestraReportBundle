@@ -8,7 +8,7 @@
         "orkestra/common": "1.0.*"
     },
     "require-dev": {
-        "symfony/symfony": "2.1.*",
+        "symfony/symfony": "3.0",
         "doctrine/orm": ">=2.2,<2.4.x-dev"
     },
     "autoload": {
