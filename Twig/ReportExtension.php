@@ -21,7 +21,7 @@ class ReportExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'present_report' => new \Twig_Function_Method($this, 'presentReport', array('is_safe' => array('html'))),
+            new \Twig_SimpleFunction('present_report', array($this, 'presentReport'), array('is_safe' => array('html'))),
         );
     }
 
