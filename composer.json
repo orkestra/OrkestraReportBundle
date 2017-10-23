@@ -8,8 +8,8 @@
         "orkestra/common": "1.0.*"
     },
     "require-dev": {
-        "symfony/symfony": "2.1.*",
-        "doctrine/orm": ">=2.2,<2.4.x-dev"
+        "symfony/symfony": "~2.3|~3.0",
+        "doctrine/orm": "~2.5"
     },
     "autoload": {
         "psr-0": { "Orkestra\\Bundle\\ReportBundle": "" }

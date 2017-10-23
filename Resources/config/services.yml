@@ -10,8 +10,8 @@ services:
 
   # Report component
   orkestra.report_factory:
-    class: %orkestra.report_factory.class%
-    arguments: [ @templating, @doctrine.orm.default_entity_manager, @form.factory ]
+    class: '%orkestra.report_factory.class%'
+    arguments: [ '@templating', '@doctrine.orm.default_entity_manager', '@form.factory' ]
   orkestra.report_presenter.snapshot:
     class: Orkestra\Bundle\ReportBundle\Presenter\SnapshotPresenter
     tags:
